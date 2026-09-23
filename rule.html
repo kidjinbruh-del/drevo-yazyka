@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Правило — Древо языка</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <nav class="nav">
+      <a class="brand" href="index.html"><i data-ic="leaf"></i>Древо языка</a>
+      <div class="nav-links">
+        <a class="nav-link" href="index.html">Дерево</a>
+        <a class="nav-link" href="rules.html">Правила</a>
+        <a class="nav-link" href="quiz.html">Тренировка</a>
+        <a class="nav-link" href="parent.html">Родителям</a>
+      </div>
+      <div class="grade-pad"><select data-grade-select title="Мой класс"></select></div>
+    </nav>
+  </header>
+
+  <main>
+    <div class="wrap" data-rule>
+      <a class="crumb" href="rules.html">← Все листья</a>
+      <span class="badge g1" data-rule-badge></span>
+
+      <div class="rule-layout">
+        <div>
+          <section class="panel human-card">
+            <div class="speak-row">
+              <button class="listen-btn" data-rule-speak type="button" aria-label="Послушать правило"><i data-ic="speaker"></i></button>
+              <div>
+                <h2 data-rule-title></h2>
+                <p class="rule-human" data-rule-human></p>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel sub-block">
+            <details class="details">
+              <summary>Так это написано в учебнике <i data-ic="chevR"></i></summary>
+              <div class="speak-row">
+                <button class="listen-btn" data-tb-speak type="button" aria-label="Послушать учебник"><i data-ic="speaker"></i></button>
+                <p class="tb" data-rule-textbook></p>
+              </div>
+            </details>
+          </section>
+
+          <section class="panel sub-block">
+            <h3>Примеры</h3>
+            <ul class="ex-list" data-rule-examples></ul>
+          </section>
+
+          <section class="panel sub-block wrong-card">
+            <h3>Так нельзя</h3>
+            <p class="rule-wrong" data-rule-wrong></p>
+          </section>
+
+          <section class="panel sub-block">
+            <h3>Где ошибаются</h3>
+            <ul class="err-list" data-rule-errors></ul>
+          </section>
+        </div>
+
+        <aside>
+          <section class="panel">
+            <h3>Попробуй сам</h3>
+            <p>Ответь на вопросы — и правило станет листиком на твоём дереве.</p>
+            <div class="trainer" data-trainer></div>
+            <div class="learned-note" data-learned-note>Листик вырос! Можно идти дальше.</div>
+          </section>
+          <section class="panel sub-block" data-rule-links>
+            <h3>Откуда выросло</h3>
+            <div class="sibling-chips"></div>
+          </section>
+          <section class="panel sub-block" data-rule-next>
+            <h3>Что дальше</h3>
+            <div class="sibling-chips"></div>
+          </section>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer wrap">Древо языка — русский язык как живая система.</footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/icons.js"></script>
+  <script src="js/voice.js"></script>
+  <script src="js/progress.js"></script>
+  <script src="js/trainer.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/rule.js"></script>
+</body>
+</html>

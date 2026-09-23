@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Древо языка — русский язык как живая система</title>
+  <meta name="description" content="Объяснялка по русскому языку для 1–3 класса: правила человеческим языком, озвучка, тренажёр и шпаргалка родителю.">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <nav class="nav">
+      <a class="brand" href="index.html"><i data-ic="leaf"></i>Древо языка</a>
+      <div class="nav-links">
+        <a class="nav-link" href="index.html">Дерево</a>
+        <a class="nav-link" href="rules.html">Правила</a>
+        <a class="nav-link" href="quiz.html">Тренировка</a>
+        <a class="nav-link" href="parent.html">Родителям</a>
+      </div>
+      <div class="grade-pad"><select data-grade-select title="Мой класс"></select></div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="wrap hero">
+      <div class="hero-grid">
+        <div>
+          <h1>Русский язык <span class="em">растёт</span> вместе с тобой</h1>
+          <p class="lede">Каждое правило — листик на твоём дереве. Объясняем по-человечески, озвучиваем, а потом даём потрогать руками.</p>
+          <div class="hero-cta">
+            <a class="btn" href="rules.html">Начать с правил <i data-ic="arrowR"></i></a>
+            <a class="btn ghost" href="parent.html">Родителям — переводчик</a>
+          </div>
+          <p class="hero-note"><span data-total>0</span> правил за 1–3 класс. Без слёз и зубрёжки.</p>
+        </div>
+        <div class="tree-panel rv">
+          <div class="tree-top">
+            <span class="tree-title">Моё дерево</span>
+            <span class="tree-stats">выросло <span class="tree-stats-num">0</span> <span data-total-text></span> листиков</span>
+          </div>
+          <div data-tree></div>
+          <div class="progress-track"><div class="progress-fill" data-progress-bar></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap section" data-grade-trigger>
+      <h2>С какого класса начнём?</h2>
+      <p class="sub">Выбери класс — и дерево покажет только твои листья. Потом класс можно поменять в шапке.</p>
+      <div data-grade-chips class="chips"></div>
+    </section>
+
+    <section class="wrap section">
+      <h2>Ветки — по классам</h2>
+      <p class="sub">Каждый класс — своя ветка. Открой ветку и собери с неё все листья-правила.</p>
+      <div class="branch-grid" data-branches></div>
+    </section>
+
+    <section class="wrap section">
+      <h2>Как это устроено</h2>
+      <div class="how-grid">
+        <div class="how-card rv">
+          <i data-ic="book"></i>
+          <h3>По-человечески</h3>
+          <p>Правило написано понятными словами, а не учебниковым канцеляритом. Кнопка озвучки прочитает его вслух.</p>
+        </div>
+        <div class="how-card rv">
+          <i data-ic="speaker"></i>
+          <h3>Слышим и трогаем</h3>
+          <p>Примеры — как живые предложения. Ребёнок кликает по словам и сам находит подлежащее или ударение.</p>
+        </div>
+        <div class="how-card rv">
+          <i data-ic="star"></i>
+          <h3>Растём</h3>
+          <p>Каждое пройденное правило превращается в листик на личном дереве. Так видно, сколько уже выращено.</p>
+        </div>
+        <div class="how-card rv">
+          <i data-ic="grow"></i>
+          <h3>Система, а не список</h3>
+          <p>Каждое правило показывает, из чего оно выросло. Ребёнок видит связи, а не набор отдельных фактов.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap section">
+      <h2>Достижения</h2>
+      <p class="sub">Дерево отмечает маленькие победы.</p>
+      <template data-ach-tpl>
+        <div class="ach-item">
+          <b data-ach-t></b>
+          <span data-ach-d></span>
+        </div>
+      </template>
+      <div class="ach-grid" data-ach></div>
+    </section>
+  </main>
+
+  <footer class="footer wrap">
+    Древо языка — русский язык как живая система. Статический сайт без интернета и без зависимостей.
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/icons.js"></script>
+  <script src="js/voice.js"></script>
+  <script src="js/progress.js"></script>
+  <script src="js/trainer.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/index.js"></script>
+</body>
+</html>

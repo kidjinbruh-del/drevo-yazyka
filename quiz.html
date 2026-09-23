@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Тренировка — Древо языка</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <nav class="nav">
+      <a class="brand" href="index.html"><i data-ic="leaf"></i>Древо языка</a>
+      <div class="nav-links">
+        <a class="nav-link" href="index.html">Дерево</a>
+        <a class="nav-link" href="rules.html">Правила</a>
+        <a class="nav-link" href="quiz.html">Тренировка</a>
+        <a class="nav-link" href="parent.html">Родителям</a>
+      </div>
+      <div class="grade-pad"><select data-grade-select title="Мой класс"></select></div>
+    </nav>
+  </header>
+
+  <main>
+    <div class="wrap page-head">
+      <h1>Тренировка</h1>
+      <p>Вопросы из правил твоего класса, вперемешку. Отвечай — дерево будет гордиться.</p>
+    </div>
+    <div class="wrap">
+      <div class="quiz-toolbar">
+        <label>Класс: <select data-quiz-select title="Класс для тренировки"></select></label>
+        <span class="tr-pager" data-quiz-meta></span>
+      </div>
+      <div data-quiz>
+        <div data-quiz-trainer></div>
+      </div>
+      <div class="quiz-result" data-quiz-result>
+        <h3 data-qr-title></h3>
+        <p data-qr-score></p>
+        <button class="btn" type="button">Ещё раз</button>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer wrap">Древо языка — русский язык как живая система.</footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/icons.js"></script>
+  <script src="js/voice.js"></script>
+  <script src="js/progress.js"></script>
+  <script src="js/trainer.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/quiz.js"></script>
+</body>
+</html>

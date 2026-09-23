@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Родителям — Древо языка</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <nav class="nav">
+      <a class="brand" href="index.html"><i data-ic="leaf"></i>Древо языка</a>
+      <div class="nav-links">
+        <a class="nav-link" href="index.html">Дерево</a>
+        <a class="nav-link" href="rules.html">Правила</a>
+        <a class="nav-link" href="quiz.html">Тренировка</a>
+        <a class="nav-link" href="parent.html">Родителям</a>
+      </div>
+      <div class="grade-pad"><select data-grade-select title="Мой класс"></select></div>
+    </nav>
+  </header>
+
+  <main>
+    <div class="wrap page-head">
+      <h1>Родителям</h1>
+      <p>Школьные формулировки — для тетради. Объяснения здесь — для ребёнка. Вставь заумную фразу из учебника, и получи перевод.</p>
+    </div>
+
+    <section class="wrap section">
+      <h2>Переводчик с учебникового</h2>
+      <p class="sub">Введи фразу, которую ребёнок не понял: «основу предложения составляют главные члены», «нарицательные имена», «оглушение согласных»…</p>
+      <form class="tr-form" data-tr-form>
+        <input class="search" type="text" data-tr-input placeholder="Например: основу предложения составляют главные члены" aria-label="Фраза из учебника">
+        <button class="btn" type="submit">Перевести <i data-ic="arrowR"></i></button>
+      </form>
+      <div class="tr-out" data-tr-out></div>
+    </section>
+
+    <section class="wrap section">
+      <h2>Как объяснить «главные члены» за 5 минут</h2>
+      <ol class="howto">
+        <li>Возьми любое предложение из дома: «Кот спит на диване».</li>
+        <li>Спроси: «Кто? что? делает главное?» — кот. Это подлежащее.</li>
+        <li>Спроси: «Что делает кот?» — спит. Это сказуемое.</li>
+        <li>Покажи, что «на диване» можно выкинуть, а предложение останется. Это не главное — второстепенное.</li>
+        <li>Теперь пусть ребёнок найдёт пару «кто — что делает» сам, в своём предложении, и объяснит тебе. Кто объясняет — тот понял.</li>
+      </ol>
+    </section>
+
+    <section class="wrap section">
+      <div class="cheat-actions">
+        <h2 style="margin:0" id="cheat">Шпаргалка: все правила одним взглядом</h2>
+        <button class="btn ghost" data-print type="button"><i data-ic="printer"></i>Распечатать</button>
+      </div>
+      <p class="sub">Слева — как говорит учебник. Справа — как сказать ребёнку.</p>
+      <table class="sheet">
+        <thead>
+          <tr><th>Правило</th><th>Так в учебнике</th><th>Так дома</th></tr>
+        </thead>
+        <tbody data-cheatsheet></tbody>
+      </table>
+    </section>
+  </main>
+
+  <footer class="footer wrap">Древо языка — русский язык как живая система.</footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/icons.js"></script>
+  <script src="js/voice.js"></script>
+  <script src="js/progress.js"></script>
+  <script src="js/trainer.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/parent.js"></script>
+</body>
+</html>
