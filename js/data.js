@@ -12,7 +12,7 @@
      quiz       вопросы тренажёра: choice | tap
         choice: options [{t, ok, why}], ровно один ok
         tap:    tokens [..], steps [{i, mark, why}] — кликаем по словам по очереди
-   noastro: без эмодзи, без сборки, без зависимостей. */
+   Принципы: без эмодзи, без сборки, без зависимостей. */
 var rulesData = {
   "rules": [
 

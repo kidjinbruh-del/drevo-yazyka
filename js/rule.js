@@ -33,10 +33,7 @@
     var speaker = root.querySelector("[data-rule-speak]");
     if (speaker) {
       speaker.setAttribute("data-voice", rule.human);
-      speaker.addEventListener("click", function () {
-        if (Voice.supported) Voice.speak(rule.human);
-        else Progress.toast("Озвучка недоступна");
-      });
+      speaker.setAttribute("data-voice-key", rule.id + "_human");
     }
 
     var textbook = root.querySelector("[data-rule-textbook]");
@@ -44,18 +41,22 @@
       textbook.textContent = rule.textbook;
     }
     var tbSpeaker = root.querySelector("[data-tb-speak]");
-    if (tbSpeaker) tbSpeaker.setAttribute("data-voice", rule.textbook);
+    if (tbSpeaker) {
+      tbSpeaker.setAttribute("data-voice", rule.textbook);
+      tbSpeaker.setAttribute("data-voice-key", rule.id + "_textbook");
+    }
 
     var exWrap = root.querySelector("[data-rule-examples]");
     if (exWrap) {
-      rule.examples.forEach(function (ex) {
+      rule.examples.forEach(function (ex, i) {
         var li = document.createElement("li");
         li.className = "ex";
         var btn = document.createElement("button");
         btn.className = "listen-btn";
         btn.type = "button";
-        btn.setAttribute("aria-label", "Послушать пример");
+        btn.setAttribute("aria-label", "Послушать пример " + (i + 1));
         btn.setAttribute("data-voice", ex);
+        btn.setAttribute("data-voice-key", rule.id + "_ex" + i);
         li.appendChild(btn);
         li.appendChild(document.createTextNode(ex));
         exWrap.appendChild(li);

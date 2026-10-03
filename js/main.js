@@ -59,16 +59,17 @@
   window.DrevoHelpers = {
     ready: ready,
     gradeLabel: gradeLabel,
-    speak: function (text) {
-      if (Voice.supported) Voice.speak(text);
-      else Progress.toast("Озвучка недоступна в этом браузере");
+    speak: function (text, opts) {
+      if (Voice.speak(text, opts)) return;
+      Progress.toast("Озвучка недоступна в этом браузере");
     },
     bindSpeak: function (root) {
       var btns = (root || document).querySelectorAll("[data-voice]");
       btns.forEach(function (b) {
         b.addEventListener("click", function () {
           var t = b.getAttribute("data-voice");
-          if (t) DrevoHelpers.speak(t);
+          var k = b.getAttribute("data-voice-key");
+          if (t) DrevoHelpers.speak(t, k ? { key: k } : null);
         });
       });
     }
