@@ -70,20 +70,36 @@ var Progress = (function () {
     tree: function (rootEl) {
       if (!rootEl) return;
       var rules = window.RULES || [];
-      var traces = {
-        1: [ {x:170,y:226},{x:150,y:208},{x:130,y:190},{x:110,y:172},{x:92,y:156},{x:74,y:143} ],
-        2: [ {x:196,y:214},{x:214,y:186},{x:196,y:158},{x:214,y:130},{x:198,y:102} ],
-        3: [ {x:248,y:228},{x:268,y:208},{x:288,y:190},{x:308,y:172},{x:328,y:156},{x:348,y:142},{x:368,y:130} ]
+/* Геометрия ветвей: одна кривая на класс, листья расставляются выборкой
+         точек вдоль неё. Раньше позиции листьев были расставлены руками,
+         из-за чего дерево выглядело как зелёные пятна на палке. */
+      var BRANCH = {
+        1: { p: [[214, 268], [176, 250], [122, 214], [74, 148]], tip: [74, 148], label: "1 класс", ax: "end" },
+        2: { p: [[214, 266], [220, 216], [214, 150], [220, 88]], tip: [220, 88], label: "2 класс", ax: "middle" },
+        3: { p: [[214, 268], [258, 248], [318, 208], [382, 140]], tip: [382, 140], label: "3 класс", ax: "start" }
       };
-      var bis = {
-        1: 'M210,260 Q165,238 82,150',
-        2: 'M210,258 Q214,184 210,106',
-        3: 'M210,260 Q255,238 372,138'
-      };
-      var labels = { 1: { x: 62, y: 118, t: "1 класс" }, 2: { x: 210, y: 86, t: "2 класс" }, 3: { x: 362, y: 102, t: "3 класс" } };
+
+      function bez(pt, t) {
+        var u = 1 - t;
+        return [
+          u * u * u * pt[0][0] + 3 * u * u * t * pt[1][0] + 3 * u * t * t * pt[2][0] + t * t * t * pt[3][0],
+          u * u * u * pt[0][1] + 3 * u * u * t * pt[1][1] + 3 * u * t * t * pt[2][1] + t * t * t * pt[3][1]
+        ];
+      }
+      function bezD(pt) {
+        return "M" + pt[0][0] + "," + pt[0][1] +
+          " C" + pt[1][0] + "," + pt[1][1] +
+          " " + pt[2][0] + "," + pt[2][1] +
+          " " + pt[3][0] + "," + pt[3][1];
+      }
+      function angleAt(pt, t) {
+        var a = bez(pt, Math.max(0, t - 0.02));
+        var b = bez(pt, Math.min(1, t + 0.02));
+        return Math.atan2(b[1] - a[1], b[0] - a[0]) * 180 / Math.PI;
+      }
 
       var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-      svg.setAttribute("viewBox", "0 0 440 372");
+      svg.setAttribute("viewBox", "0 0 440 400");
       svg.setAttribute("class", "tree");
       svg.setAttribute("role", "img");
       svg.setAttribute("aria-label", "Личное дерево знаний");
@@ -102,39 +118,71 @@ var Progress = (function () {
         return el;
       }
 
-      add("path", { d: "M60,352 Q210,356 380,350", stroke: "#9ccc65", "stroke-width": 6, fill: "none", "stroke-linecap": "round" });
-      add("path", { d: "M210,352 Q214,300 210,258", stroke: "#6d4c41", "stroke-width": 16, fill: "none", "stroke-linecap": "round" });
-      add("path", { d: "M210,310 Q214,286 210,268", stroke: "#8d6e63", "stroke-width": 4, fill: "none" });
+      /* --- земля и крона-подсветка --- */
+      add("ellipse", { cx: 220, cy: 372, rx: 150, ry: 16, class: "tree-shadow" });
+      add("path", { d: "M62,368 Q140,352 220,360 Q300,352 378,368", class: "tree-ground" });
+      add("ellipse", { cx: 220, cy: 190, rx: 190, ry: 130, class: "tree-glow" });
+
+      /* --- ствол: два контура, чтобы получить сужение --- */
+      add("path", {
+        d: "M214,262 C206,300 200,330 196,364 L236,364 C232,330 222,300 214,262 Z",
+        class: "tree-trunk"
+      });
+      add("path", { d: "M214,268 C212,300 210,330 209,360", class: "tree-trunk-line" });
+      add("path", { d: "M214,300 C196,314 182,330 176,364", class: "tree-root" });
+      add("path", { d: "M214,306 C232,318 246,332 252,364", class: "tree-root" });
 
       var order = {};
       rules.forEach(function (r, idx) { order[r.id] = idx; });
       var seq = [];
 
       [1, 2, 3].forEach(function (g) {
-        add("path", { d: bis[g], stroke: "#8d6e63", "stroke-width": 7, fill: "none", "stroke-linecap": "round" });
+        var b = BRANCH[g];
+        add("path", { d: bezD(b.p), class: "tree-branch" });
+
         var gs = rules.filter(function (r) { return r.grade === g; });
-        gs.sort(function (a, b) { return order[a.id] - order[b.id]; });
+        gs.sort(function (a, c) { return order[a.id] - order[c.id]; });
+        var n = gs.length;
         gs.forEach(function (r, j) {
-          seq.push({ r: r, pos: traces[g][j] });
-          var lg = add("g", { class: "leaf " + (state.seen[r.id] ? "on" : ""), transform: "translate(" + traces[g][j].x + "," + traces[g][j].y + ")" });
-          addTo(lg, "ellipse", { rx: "17", ry: "11", class: "leaf-shape" });
+          // Листья расходятся от ствола к краю ветви и чередуются стороной.
+          var t = n === 1 ? 0.62 : 0.34 + (j / (n - 1)) * 0.58;
+          var p = bez(b.p, t);
+          var rot = angleAt(b.p, t) + (j % 2 ? 34 : -34);
+          seq.push({ r: r });
+          var lg = add("g", {
+            class: "leaf",
+            "data-on": state.seen[r.id] ? "1" : "0",
+            transform: "translate(" + p[0].toFixed(1) + "," + p[1].toFixed(1) + ") rotate(" + rot.toFixed(1) + ")"
+          });
+          addTo(lg, "path", { d: "M0,0 C7,-9 21,-9 29,0 C21,9 7,9 0,0 Z", class: "leaf-shape" });
+          addTo(lg, "path", { d: "M2,0 L27,0", class: "leaf-vein" });
         });
-        var lb = labels[g];
-        add("text", { x: lb.x, y: lb.y, "class": "tree-label", "text-anchor": lb.x < 150 ? "end" : (lb.x > 300 ? "start" : "middle") }).textContent = lb.t;
+
+        var lb = add("text", {
+          x: b.tip[0], y: b.tip[1] - 16, "class": "tree-label", "text-anchor": b.ax
+        });
+        lb.textContent = b.label;
       });
 
-      add("circle", { cx: 205, cy: 268, r: 9, fill: "#5d4037" });
-      add("circle", { cx: 217, cy: 276, r: 6, fill: "#5d4037" });
-      add("circle", { cx: 199, cy: 284, r: 4, fill: "#5d4037" });
+      /* --- сердцевина ствола: показывает общий проход --- */
+      var done = rules.filter(function (r) { return state.seen[r.id]; }).length;
+      add("circle", { cx: 214, cy: 286, r: 11, class: "tree-heart" });
 
       rootEl.appendChild(svg);
+      rootEl.appendChild(svg);
+      // Состояние листа задаём атрибутом, а не классом: класс «on» в этом файле
+      // наследуется от предыдущей отрисовки и красит все листья разом.
+      Array.prototype.forEach.call(svg.querySelectorAll(".leaf"), function (el, i) {
+        var r = seq[i] && seq[i].r;
+        el.setAttribute("data-on", r && state.seen[r.id] ? "1" : "0");
+      });
       return {
         refresh: function () {
           var leaves = svg.querySelectorAll(".leaf");
           var n = 0;
           seq.forEach(function (item, i) {
             var on = state.seen[item.r.id];
-            leaves[i].classList.toggle("on", on);
+            leaves[i].setAttribute("data-on", on ? "1" : "0");
             if (on) n++;
           });
           return n;

@@ -1,0 +1,445 @@
+/* ==========================================================================
+   Древо языка — слой оформления приложения.
+
+   Сайт остаётся сайтом: те же страницы, те же классы. Этот файл — оболочка,
+   которая превращает его в приложение: палитра, тёмная тема, нижняя панель
+   вкладок, безопасные зоны под статус-бар и системную панель телефона.
+
+   Идея: лес вечером. Тёмная база — глубокий хвойный, листья — свежая зелень,
+   тёплый янтарь — для «урожая» (пройденных правил). Светлая тема — бумага
+   с зелёными тенями, чтобы не выглядело как вывернутый негатив.
+   ========================================================================== */
+
+:root,
+[data-theme="dark"] {
+  --bg: #0b1410;
+  --bg-2: #0e1a15;
+  --card: #142420;
+  --card-2: #10201b;
+  --line: #1f3a31;
+  --line-soft: #172c25;
+  --text: #e8f3ec;
+  --muted: #93b3a3;
+  --leaf: #46c98a;
+  --leaf-2: #7fe0ad;
+  --leaf-deep: #2a8f61;
+  --sun: #f0b45c;
+  --sun-soft: #f7d9a4;
+  --sky: #6fb7d8;
+  --bad: #e8837b;
+  --ring: rgba(70, 201, 138, .28);
+  --glow: rgba(70, 201, 138, .12);
+  --shadow: 0 18px 40px -22px rgba(0, 0, 0, .85);
+  --r: 18px;
+  --r-sm: 12px;
+  --tab-h: 62px;
+}
+
+[data-theme="light"] {
+  --bg: #f2f7f2;
+  --bg-2: #e8f1e9;
+  --card: #ffffff;
+  --card-2: #f4f9f4;
+  --line: #d7e6da;
+  --line-soft: #e6f0e8;
+  --text: #10221a;
+  --muted: #4d6d5d;
+  --leaf: #1f9d63;
+  --leaf-2: #178053;
+  --leaf-deep: #0f6b45;
+  --sun: #b4761a;
+  --sun-soft: #f7e3c4;
+  --sky: #2f7ea6;
+  --bad: #c0392b;
+  --ring: rgba(31, 157, 99, .22);
+  --glow: rgba(31, 157, 99, .10);
+  --shadow: 0 16px 34px -24px rgba(16, 60, 38, .5);
+}
+
+* { -webkit-tap-highlight-color: transparent; }
+
+html {
+  background: var(--bg);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background:
+    radial-gradient(1200px 520px at 78% -8%, var(--glow), transparent 62%),
+    linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%) fixed;
+  background-attachment: fixed;
+  color: var(--text);
+  font-family: "Segoe UI", Roboto, system-ui, -apple-system, sans-serif;
+  padding-bottom: calc(var(--tab-h) + env(safe-area-inset-bottom) + 14px);
+  overflow-x: hidden;
+}
+
+/* --- шапка --------------------------------------------------------------- */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  padding-top: env(safe-area-inset-top);
+  background: color-mix(in srgb, var(--bg) 86%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.nav {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: .2px;
+  color: var(--text);
+  text-decoration: none;
+  flex: 0 0 auto;
+}
+
+.brand i { color: var(--leaf); font-size: 18px; }
+
+/* На телефоне навигация уезжает в нижнюю панель, в шапке остаётся класс. */
+.nav-links { display: none; }
+
+.grade-pad {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.grade-pad select,
+select[data-grade-select] {
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 7px 12px;
+  font: inherit;
+  font-size: 13px;
+  min-width: 92px;
+}
+
+/* --- кнопки темы и действий --------------------------------------------- */
+
+.app-tools { display: inline-flex; gap: 8px; }
+
+.icon-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--text);
+  font-size: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.icon-btn:active { transform: scale(.94); border-color: var(--leaf); }
+
+/* --- нижняя панель вкладок (главное отличие от сайта) -------------------- */
+
+.app-tabbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 40;
+  display: grid;
+  /* minmax(0, 1fr) обязателен: обычный 1fr берёт минимум по содержимому,
+     и панель распирало за край экрана на 21 px. */
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 2px;
+  padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
+  background: color-mix(in srgb, var(--card) 92%, transparent);
+  backdrop-filter: blur(14px);
+  border-top: 1px solid var(--line);
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.app-tabbar a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 7px 2px 6px;
+  border-radius: 14px;
+  text-decoration: none;
+  color: var(--muted);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .1px;
+  min-height: 50px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.app-tabbar a span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+
+.app-tabbar a .tab-ic { font-size: 19px; line-height: 1; }
+.app-tabbar a[aria-current="page"] {
+  color: var(--leaf);
+  background: color-mix(in srgb, var(--leaf) 12%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--leaf) 28%, transparent);
+}
+
+/* --- текст и блоки ------------------------------------------------------- */
+
+h1, h2, h3 { color: var(--text); letter-spacing: -.2px; }
+
+h1 { font-size: clamp(26px, 7.4vw, 40px); line-height: 1.1; }
+
+.em {
+  color: var(--leaf);
+  background: linear-gradient(180deg, transparent 62%, var(--glow) 62%);
+}
+
+.lede, .sub, .hero-note { color: var(--muted); }
+.lede { font-size: 16px; line-height: 1.55; }
+
+/* Селектор из двух классов-контекста, а не один `.wrap`: в сайтовом CSS есть
+   `.wrap` с `padding: 0`, и он перебивал одинаковую по весу правку. */
+main .wrap,
+.footer.wrap {
+  max-width: 900px;
+  margin: 0 auto;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.wrap { max-width: 900px; margin: 0 auto; padding-left: 16px; padding-right: 16px; }
+
+.section { padding: 22px 0; }
+main .section h2 { font-size: 21px; margin: 0 0 6px; }
+
+.hero { padding-top: 20px; padding-bottom: 8px; }
+.hero-grid { display: grid; gap: 16px; }
+.hero-cta { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0 10px; }
+
+/* Подзаголовок и пояснения: в сайтовом CSS это `.hero .lede` — два класса,
+   то есть вес выше, чем у одиночного селектора. Здесь намеренно те же два
+   класса, но правило стоит позже и потому выигрывает. */
+.hero .lede,
+.hero .sub,
+.hero .hero-note,
+main .lede,
+main .sub,
+main .hero-note {
+  color: var(--muted);
+  font-size: 15.5px;
+  line-height: 1.5;
+  margin: 0 0 8px;
+}
+
+.hero h1 {
+  font-size: clamp(25px, 6.8vw, 36px);
+  line-height: 1.15;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(180deg, var(--leaf), var(--leaf-deep));
+  color: #fff;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  padding: 13px 18px;
+  font: inherit;
+  font-weight: 700;
+  font-size: 15px;
+  text-decoration: none;
+  min-height: 48px;
+  box-shadow: 0 10px 22px -14px var(--leaf);
+}
+
+.btn.ghost {
+  background: var(--card);
+  color: var(--text);
+  border-color: var(--line);
+  box-shadow: none;
+}
+
+.btn:active { transform: translateY(1px); }
+
+/* --- карточки ------------------------------------------------------------ */
+
+.tree-panel,
+.how-card,
+.branch-card,
+.ach-item,
+.card {
+  background: linear-gradient(180deg, var(--card), var(--card-2));
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  box-shadow: var(--shadow);
+  padding: 16px;
+}
+
+.tree-panel { position: relative; overflow: hidden; }
+.tree-panel::after {
+  content: "";
+  position: absolute;
+  inset: auto -30% -60% -30%;
+  height: 160px;
+  background: radial-gradient(closest-side, var(--glow), transparent);
+  pointer-events: none;
+}
+
+.tree-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.tree-title { font-weight: 700; }
+.tree-stats { color: var(--muted); font-size: 12.5px; }
+.tree-stats-num { color: var(--sun); font-weight: 700; }
+
+.progress-track {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--line-soft);
+  overflow: hidden;
+  margin-top: 12px;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--leaf-deep), var(--leaf), var(--leaf-2));
+  transition: width .45s cubic-bezier(.2, .8, .2, 1);
+}
+
+.branch-grid, .how-grid, .ach-grid, .chips {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+}
+
+/* Сайт свёрстан под широкий экран: карточки веток со списками и само дерево
+   вылезали за экран телефона (страница становилась шире на 21 px, дерево
+   обрезалось). На узком экране — одна колонка и всё, что шире, ужимается. */
+@media (max-width: 759px) {
+  .branch-grid, .how-grid, .ach-grid { grid-template-columns: 1fr; }
+  .branch-card, .branch-list, .branch-list li { min-width: 0; max-width: 100%; }
+  .branch-list { overflow-wrap: anywhere; }
+  .tree-panel svg { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+}
+
+.chips { grid-template-columns: repeat(3, 1fr); }
+
+/* Классы как листья: крупная точкака для детей. */
+.chip, .chips button, .branch-card {
+  min-height: 54px;
+  border-radius: 16px;
+}
+
+.how-grid { grid-template-columns: 1fr; }
+.how-card i { color: var(--leaf); font-size: 22px; }
+
+.ach-item { display: flex; flex-direction: column; gap: 4px; min-height: 74px; justify-content: center; }
+.ach-item span { color: var(--muted); font-size: 12.5px; }
+
+/* --- дерево ------------------------------------------------------------- */
+
+.tree-panel svg { width: 100%; height: auto; display: block; }
+
+.tree-panel .tree-shadow { fill: color-mix(in srgb, var(--leaf) 12%, transparent); }
+.tree-panel .tree-glow { fill: var(--glow); }
+.tree-panel .tree-ground {
+  fill: none;
+  stroke: var(--leaf-deep);
+  stroke-width: 5;
+  stroke-linecap: round;
+  opacity: .75;
+}
+.tree-panel .tree-trunk { fill: color-mix(in srgb, var(--sun) 32%, var(--card)); }
+.tree-panel .tree-trunk-line {
+  fill: none;
+  stroke: color-mix(in srgb, var(--sun) 55%, var(--card));
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+.tree-panel .tree-root {
+  fill: none;
+  stroke: color-mix(in srgb, var(--sun) 40%, var(--card));
+  stroke-width: 7;
+  stroke-linecap: round;
+}
+.tree-panel .tree-branch {
+  fill: none;
+  stroke: color-mix(in srgb, var(--sun) 28%, var(--card));
+  stroke-width: 7;
+  stroke-linecap: round;
+}
+.tree-panel .tree-heart { fill: var(--leaf); opacity: .85; }
+
+/* Лист: незаученный — только контур, выученный — заливка. */
+.tree-panel .leaf-shape {
+  stroke: var(--leaf);
+  stroke-width: 2;
+  fill: transparent;
+  transition: fill .25s;
+}
+.tree-panel .leaf-vein { stroke: var(--leaf); stroke-width: 1.2; opacity: .55; }
+.tree-panel .leaf[data-on="1"] .leaf-shape { fill: var(--leaf); }
+.tree-panel .leaf[data-on="1"] .leaf-vein { stroke: var(--card); opacity: .8; }
+
+.tree-panel .tree-label {
+  fill: var(--muted);
+  font-size: 15px;
+  font-weight: 600;
+  font-family: inherit;
+}
+
+/* --- прочее --------------------------------------------------------------- */
+
+.footer {
+  color: var(--muted);
+  font-size: 12.5px;
+  padding: 18px 16px calc(var(--tab-h) + env(safe-area-inset-bottom) + 18px);
+  border-top: 1px solid var(--line-soft);
+}
+
+a { color: var(--leaf-2); }
+
+:focus-visible { outline: 2px solid var(--leaf); outline-offset: 2px; border-radius: 8px; }
+
+/* Планшет и широкий экран: панель вкладок не нужна, возвращаем верхнюю навигацию. */
+@media (min-width: 760px) {
+  .app-tabbar { display: none; }
+  .nav-links {
+    display: flex;
+    gap: 4px;
+    margin-left: 14px;
+  }
+  .nav-link {
+    color: var(--muted);
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .nav-link:hover { color: var(--text); background: var(--card); }
+  .hero-grid { grid-template-columns: 1.1fr .9fr; align-items: center; }
+  .how-grid { grid-template-columns: repeat(2, 1fr); }
+  body { padding-bottom: 20px; }
+  .footer { padding-bottom: 20px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}

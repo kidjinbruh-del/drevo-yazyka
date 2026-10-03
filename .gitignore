@@ -1,0 +1,21 @@
+# Нативная обёртка: то, что не должно попасть в репозиторий
+android-app/node_modules/
+android-app/android/
+android-app/www/
+android-app/tools/*.ps1.bak
+
+# Ключи подписи и локальные настройки — никогда в git
+*.jks
+*.keystore
+keystore.properties
+android-app/keystore.properties
+local.properties
+android-app/android/local.properties
+android-app/android/app/build/
+android-app/android/build/
+android-app/android/.gradle/
+
+# Прочее
+.DS_Store
+node_modules/
+__pycache__/

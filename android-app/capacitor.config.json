@@ -1,0 +1,12 @@
+{
+  "appId": "ru.drevo.yazyka",
+  "appName": "Древо языка",
+  "webDir": "www",
+  "android": {
+    "allowMixedContent": false,
+    "webContentsDebuggingEnabled": false
+  },
+  "server": {
+    "androidScheme": "https"
+  }
+}
