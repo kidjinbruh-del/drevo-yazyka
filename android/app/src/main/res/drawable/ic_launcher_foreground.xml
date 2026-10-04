@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- Дерево: ствол, крона, два листа. Плоский, без градиентов: иконка должна
+     читаться даже в монохромной маске лаунчера. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#8A5A2B"
+        android:pathData="M51,54 L57,54 L57,82 L51,82 Z" />
+    <path
+        android:fillColor="#8A5A2B"
+        android:pathData="M54,62 C46,60 40,64 37,70 C44,68 50,66 54,66 Z" />
+    <path
+        android:fillColor="#8A5A2B"
+        android:pathData="M54,66 C62,64 68,68 71,74 C64,72 58,70 54,70 Z" />
+    <path
+        android:fillColor="#46C98A"
+        android:pathData="M54,18 C68,18 78,29 78,42 C78,55 68,64 54,64 C40,64 30,55 30,42 C30,29 40,18 54,18 Z" />
+    <path
+        android:fillColor="#7FE0AD"
+        android:pathData="M44,34 C48,30 54,29 58,31 C54,36 48,38 44,37 Z" />
+    <path
+        android:fillColor="#7FE0AD"
+        android:pathData="M60,44 C64,40 70,39 74,41 C70,46 64,48 60,47 Z" />
+    <path
+        android:fillColor="#F0B45C"
+        android:pathData="M54,36 m-3,0 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0" />
+</vector>

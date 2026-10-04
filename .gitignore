@@ -1,19 +1,26 @@
-# Нативная обёртка: то, что не должно попасть в репозиторий
+# Нативное Android-приложение (Kotlin + Compose)
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+android/keystore.properties
+# Озвучка в res/raw — копия из audio/. Держим один источник: 36 mp3 не должны
+# лежать в репозитории дважды. Перед сборкой их кладёт на место tools/sync-audio.ps1.
+android/app/src/main/res/raw/
+# Ключ подписи и его описание живут вне git: теряем файл — теряем
+# возможность выпускать обновления поверх уже установленного приложения.
+keystore/
+*.jks
+*.keystore
+
+# Старая обёртка Capacitor: то, что не должно попасть в репозиторий.
+# Проект сохранён как история 1.0.0, но больше не собирается — см. README.
 android-app/node_modules/
 android-app/android/
 android-app/www/
 android-app/tools/*.ps1.bak
-
-# Ключи подписи и локальные настройки — никогда в git
-*.jks
-*.keystore
-keystore.properties
 android-app/keystore.properties
 local.properties
-android-app/android/local.properties
-android-app/android/app/build/
-android-app/android/build/
-android-app/android/.gradle/
 
 # Прочее
 .DS_Store

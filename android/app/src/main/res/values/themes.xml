@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Тёмная тема задана принудительно: приложение тёмное по умолчанию,
+         а DayNight на светлом телефоне оставлял белые статус-бар и навигацию. -->
+    <style name="Theme.Drevo" parent="android:Theme.Material.NoActionBar">
+        <item name="android:statusBarColor">#0b1410</item>
+        <item name="android:navigationBarColor">#0b1410</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+    </style>
+</resources>
