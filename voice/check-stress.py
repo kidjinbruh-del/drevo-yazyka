@@ -1,14 +1,17 @@
 #!/usr/bin/env python
 """Проверка словаря ударений voice/stress-ru.txt.
 
-Три проверки, все на файле, без синтеза:
+Проверки, все на файле, без синтеза:
 
 1. знак ударения стоит на гласной (иначе слово читается неправильно);
 2. нет латиницы, потерянной при копировании (типичная беда: ó вместо ó);
-3. покрытие: каждое многосложное слово из voice/texts.json есть в словаре.
+3. в словаре нет слов короче трёх букв: при синтезе они не размечаются
+   (буквы и служебные слова), и такая запись только вводит в заблуждение;
+4. покрытие: каждое многосложное слово из voice/texts.json есть в словаре.
 
 Последнее — главная: пропущенное слово не сломается, но останется
-прочитанным так, как нейросеть догадается. Это тихо портит качество.
+прочитанным так, как нейросеть догадается. Это тихо портит качество и
+звучит как «голос с акцентом».
 
 Запуск: python voice/check-stress.py
 """
@@ -27,11 +30,18 @@ TEXTS = ROOT / "voice" / "texts.json"
 VOWELS = set("аеиоуыэюяАЕИОУЫЭЮЯ")
 ACUTE = "́"
 
+# Короче трёх букв в озвучку не попадает: это служебные слова и буквы.
+# Та же граница в voice/tts-text.py (MIN_MARKED_LEN).
+MIN_MARKED_LEN = 3
+
 # Слова, которые размечать не нужно, с причиной. Без исключений проверка
 # покрытия ругается на них каждый раз, и её перестают читать.
 NO_STRESS_NEEDED = {
     "абвгдеёж": "произносится по буквам, ударение не ставится",
     "весёлый": "ударная буква ё, знак не нужен",
+    # Не слово, а две буквы в примерке «Ия»: на экране это оглавление
+    # гласных, произносить нечего, а знак над буквами ломает чтение.
+    "ия": "две буквы, не слово; в озвучку не идёт",
     # Служебные слова без собственного ударения: знак над ними только
     # сбивает голос.
     "если": "служебное, ударения нет",
@@ -41,8 +51,11 @@ NO_STRESS_NEEDED = {
     "этот": "служебное, ударения нет",
 }
 
+WORD = re.compile("[А-Яа-яЁё{}]+".format(ACUTE))
+VOWEL_COUNT = re.compile(r"[аеиоуыэюяАЕИОУЫЭЮЯ]")
 
-def load_dictionary() -> list[str]:
+
+def load_entries() -> list[str]:
     return [
         line.strip()
         for line in DICT.read_text(encoding="utf-8").splitlines()
@@ -59,12 +72,12 @@ def corpus_words() -> set[str]:
     words: set[str] = set()
     for rule in data.get("rules", []):
         for slot in rule.get("slots", []):
-            words.update(re.findall(r"[А-Яа-яЁё]+", slot.get("text", "")))
+            words.update(WORD.findall(slot.get("text", "")))
     return words
 
 
 def main() -> int:
-    entries = load_dictionary()
+    entries = load_entries()
     problems: list[str] = []
 
     latin: set[str] = set()
@@ -92,20 +105,20 @@ def main() -> int:
     for word, forms in duplicates.items():
         problems.append(f"«{word}» встречается несколько раз: {', '.join(forms)}")
 
+    short = sorted({entry for entry in entries if len(base(entry)) < MIN_MARKED_LEN})
+    if short:
+        problems.append(
+            f"слова короче {MIN_MARKED_LEN} букв не размечаются: {', '.join(short)}"
+        )
+
     needed = {
-        w.lower()
-        for w in corpus_words()
-        if len(re.findall(r"[аеиоуыэюяАЕИОУЫЭЮЯ]", w)) >= 2
+        w.lower() for w in corpus_words() if len(VOWEL_COUNT.findall(w)) >= 2
     } - set(NO_STRESS_NEEDED)
     missing = sorted(needed - set(index))
-    unused = sorted(set(index) - needed - set(NO_STRESS_NEEDED))
 
     print(f"записей в словаре: {len(entries)}")
     print(f"многосложных слов в текстах: {len(needed)}")
     print(f"не размечено: {len(missing)}")
-    print(f"лишних записей: {len(unused)}")
-    if unused:
-        print("  " + " ".join(unused))
     if missing:
         print("\nНЕ РАЗМЕЧЕНО:")
         print("  " + "\n  ".join(" ".join(missing[i:i + 8]) for i in range(0, len(missing), 8)))

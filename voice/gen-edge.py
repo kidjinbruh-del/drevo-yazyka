@@ -37,9 +37,14 @@ _spec = importlib.util.spec_from_file_location(
 tts_text = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(tts_text)
 
-# Скорость и высота: объяснение правила читают вслух, спешка неуместна.
-RATE = "-8%"
-PITCH = "+2Hz"
+# Скорость и высота.
+#
+# Раньше было -8% и +2Hz («спокойнее и выше»). На слух это давало
+# «голос с акцентом»: нейросеть нарочито выделяет слоги и держит тон, и
+# фраза звучит как перевод. Ровная подача (0%, 0 Гц) читается спокойнее,
+# а знаки ударения и так ставятся в спорных местах — см. voice/stress-voice.txt.
+RATE = "+0%"
+PITCH = "+0Hz"
 
 
 def slots() -> list[tuple[str, str]]:

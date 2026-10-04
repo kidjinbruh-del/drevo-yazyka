@@ -1,6 +1,8 @@
 /* voice.js — озвучка правил.
    1. Если для текста есть готовый аудиофайл (js/audio.js -> window.__AUDIO__) — играем файл.
-   2. Иначе синтез Web Speech API (ru-RU, локальный голос ОС). Офлайн. */
+   2. Иначе синтез Web Speech API (ru-RU, локальный голос ОС). Офлайн.
+      Текст берётся из js/speech.js — это тот же слой, что и при синтезе mp3:
+      без него примеры читались как есть, и «й-й-й» звучало как «и краткая». */
 var Voice = (function () {
   var supported = typeof window === "object" && "speechSynthesis" in window;
   var ruin = null;
@@ -8,6 +10,17 @@ var Voice = (function () {
 
   function audioMap() {
     return (typeof window === "object" && window.__AUDIO__) ? window.__AUDIO__ : {};
+  }
+
+  function speechMap() {
+    return (typeof window === "object" && window.__SPEECH__) ? window.__SPEECH__ : {};
+  }
+
+  /* Текст для голоса: подготовленный слот, иначе как есть. */
+  function spokenText(text, key) {
+    var map = speechMap();
+    if (key && map[key]) return map[key];
+    return text;
   }
 
   function playFile(url) {
@@ -65,7 +78,10 @@ var Voice = (function () {
       }
       if (!supported) return false;
       cancel();
-      var chunks = String(text).split(/[\r\n;]+/).map(function (s) { return s.replace(/^[*\s]+/, "").replace(/[—,.\s]+$/, ""); }).filter(Boolean);
+      var chunks = spokenText(text, opts.key)
+        .split(/[\r\n;]+/)
+        .map(function (s) { return s.replace(/^[*\s]+/, "").replace(/[—,.\s]+$/, ""); })
+        .filter(Boolean);
       if (!chunks.length) return false;
       queue = chunks;
       speakText(queue.shift());
