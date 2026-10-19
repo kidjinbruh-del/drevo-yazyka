@@ -66,8 +66,8 @@ html {
 body {
   background:
     radial-gradient(1200px 520px at 78% -8%, var(--glow), transparent 62%),
-    linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%) fixed;
-  background-attachment: fixed;
+    linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%) no-repeat scroll;
+  background-color: var(--bg);
   color: var(--text);
   font-family: "Segoe UI", Roboto, system-ui, -apple-system, sans-serif;
   padding-bottom: calc(var(--tab-h) + env(safe-area-inset-bottom) + 14px);
@@ -328,6 +328,17 @@ main .hero-note {
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
 }
 
+/* Ветки — три содержательные колонки, а не пять узких. При 150px
+   «Существительное» вылезало за карточку и обрезалось. */
+.branch-grid {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  align-items: start;
+}
+
+.branch-card { min-width: 0; }
+.branch-card .branch-list { min-width: 0; }
+.branch-card .branch-list li { overflow-wrap: anywhere; }
+
 /* Сайт свёрстан под широкий экран: карточки веток со списками и само дерево
    вылезали за экран телефона (страница становилась шире на 21 px, дерево
    обрезалось). На узком экране — одна колонка и всё, что шире, ужимается. */
@@ -443,3 +454,196 @@ a { color: var(--leaf-2); }
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
 }
+
+/* ==========================================================================
+   МОСТ К ПАЛИТРЕ САЙТОВОГО СЛОЯ
+
+   style.css (загружается первым) рисует панели, чипы и таблицы через
+   --paper2, --green-pale, --ink, --green-deep. app.css переопределял только
+   --bg / --text / --card, поэтому в тёмной теме панели оставались бумажными
+   (#fffdf6), а текст в них — светлым: контраст падал до ~1.05:1, правило
+   на rule.html было нечитаемым. Здесь все имена сайтового слоя сводятся
+   к палитре приложения — в обеих темах, чтобы светлая тоже была цельной.
+   ======================================================================== */
+
+[data-theme="dark"] {
+  --paper: var(--bg);
+  --paper2: var(--card);
+  --ink: var(--text);
+  --ink-soft: var(--muted);
+  --ink-faint: color-mix(in srgb, var(--muted) 74%, var(--bg));
+  --green: var(--leaf-deep);
+  --green-deep: var(--leaf-2);
+  --green-pale: color-mix(in srgb, var(--leaf) 13%, var(--card));
+  --bark: var(--sun);
+  --bark-deep: color-mix(in srgb, var(--sun) 72%, var(--text));
+  --berry: var(--bad);
+  --berry-pale: color-mix(in srgb, var(--bad) 15%, var(--card));
+  --shadow-sm: 0 3px 14px rgba(0, 0, 0, .45);
+  --ease-out: cubic-bezier(.22, .9, .24, 1);
+  --ease-spring: cubic-bezier(.34, 1.56, .64, 1);
+}
+
+[data-theme="light"] {
+  --paper: var(--bg);
+  --paper2: var(--card);
+  --ink: var(--text);
+  --ink-soft: var(--muted);
+  --ink-faint: color-mix(in srgb, var(--muted) 80%, var(--bg));
+  --green: var(--leaf);
+  --green-deep: var(--leaf-deep);
+  --green-pale: color-mix(in srgb, var(--leaf) 10%, var(--card));
+  --bark: var(--sun);
+  --berry: var(--bad);
+  --berry-pale: color-mix(in srgb, var(--bad) 10%, var(--card));
+  --ease-out: cubic-bezier(.22, .9, .24, 1);
+  --ease-spring: cubic-bezier(.34, 1.56, .64, 1);
+}
+
+/* Зелёная рамка human-card и панели результата была зашита светлым hex-ом
+   (#cfe3cb) — в тёмной теме это единственный «светлый» контур. */
+[data-theme="dark"] .human-card,
+[data-theme="dark"] .quiz-result {
+  border-color: color-mix(in srgb, var(--leaf) 34%, var(--line));
+}
+
+/* ==========================================================================
+   MOTION
+
+   Правила: анимируем только transform и opacity (композитор, без layout),
+   длительности 120–560 мс, всё отключается через prefers-reduced-motion
+   (блок выше стоит первым по файлу, но у него !important — он выигрывает).
+   ======================================================================== */
+
+@keyframes d-rise {
+  from { opacity: 0; transform: translate3d(0, 14px, 0); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes d-pop {
+  0%   { opacity: 0; transform: scale(.9); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes d-sweep {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+/* Reveal: контент виден без JS. Скрываем только когда JS реально работает
+   (html.js ставит main.js) — иначе при отключённых скриптах полстраницы
+   оставалось с opacity:0. */
+.rv { opacity: 1; transform: none; }
+
+html.js .rv {
+  opacity: 0;
+  transform: translate3d(0, 18px, 0);
+  transition:
+    opacity .55s var(--ease-out, cubic-bezier(.22, .9, .24, 1)),
+    transform .55s var(--ease-out, cubic-bezier(.22, .9, .24, 1));
+  transition-delay: calc(var(--rv-i, 0) * 55ms);
+  will-change: opacity, transform;
+}
+
+html.js .rv.in {
+  opacity: 1;
+  transform: none;
+  will-change: auto;
+}
+
+/* Вход главной: заголовок → лид → кнопки → примечание. */
+html.js .hero h1,
+html.js .hero .lede,
+html.js .hero .hero-cta,
+html.js .hero .hero-note {
+  animation: d-rise .62s var(--ease-out, ease) both;
+}
+html.js .hero .lede      { animation-delay: .07s; }
+html.js .hero .hero-cta  { animation-delay: .14s; }
+html.js .hero .hero-note { animation-delay: .2s; }
+
+/* Дерево на главной «проявляется» чуть позже текста. */
+html.js .tree-panel { animation: d-pop .7s var(--ease-spring, ease) .12s both; }
+
+/* Карточки: подъём на hover, но только там, где есть настоящий курсор. */
+@media (hover: hover) and (pointer: fine) {
+  .how-card,
+  .branch-card,
+  .ach-item,
+  .panel {
+    transition:
+      transform .3s var(--ease-out, ease),
+      box-shadow .3s var(--ease-out, ease),
+      border-color .25s ease;
+  }
+
+  .how-card:hover,
+  .branch-card:hover,
+  .panel:hover {
+    transform: translateY(-3px);
+    border-color: color-mix(in srgb, var(--leaf) 38%, var(--line));
+    box-shadow: 0 24px 48px -30px rgba(0, 0, 0, .55);
+  }
+
+  .how-card i {
+    transition: transform .32s var(--ease-spring, ease);
+  }
+  .how-card:hover i { transform: translateY(-2px) rotate(-7deg); }
+}
+
+/* Нажатие: короткий, почти физический отклик. */
+.btn,
+.chip,
+.branch-card,
+.icon-btn {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn:active,
+.chip:active,
+.icon-btn:active {
+  transform: translateY(1px) scale(.985);
+  transition-duration: .08s;
+}
+
+/* Прогресс «прорастает» слева направо, а не просто прыгает шириной. */
+html.js .progress-fill { transform-origin: left center; }
+html.js .tree-panel.in .progress-fill,
+html.js .progress-fill.ready { animation: d-sweep .9s var(--ease-out, ease) both; }
+
+/* Результат квиза приходит с масштабом — это заметнее, чем fade. */
+.quiz-result.show { animation: d-pop .42s var(--ease-spring, ease) both; }
+
+/* На странице тренировки итог показывает панель с кнопкой «Ещё раз».
+   Встроенный .tr-result дублировал бы те же цифры — прячем только здесь,
+   в мини-квизе на rule.html он остаётся. */
+[data-quiz] .tr-result { display: none; }
+
+/* Лист, который только что «вырос» (ставит main.js). */
+.tree-panel .leaf.is-new .leaf-shape { animation: d-pop .5s var(--ease-spring, ease) both; }
+
+/* Скелетон для подгружаемых списков (правила, достижения). */
+.sk {
+  position: relative;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--muted) 12%, transparent);
+  border-radius: 12px;
+  color: transparent !important;
+}
+.sk::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--text) 10%, transparent), transparent);
+  animation: sk-sweep 1.15s infinite;
+}
+@keyframes sk-sweep { to { transform: translateX(100%); } }
+
+/* Мягкий акцент на блоке «с какого класса начнём», когда класс не выбран
+   (раньше страница вместо этого сама прокручивалась вниз и обрезала hero). */
+@keyframes d-hint {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--leaf) 0%, transparent); }
+  40%      { box-shadow: 0 0 0 6px color-mix(in srgb, var(--leaf) 16%, transparent); }
+}
+[data-grade-trigger].is-hint .chips { animation: d-hint 2.4s ease-in-out 2; border-radius: 22px; }

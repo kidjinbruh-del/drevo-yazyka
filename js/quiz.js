@@ -27,7 +27,23 @@
 
     var meta = root.querySelector("[data-quiz-meta]");
     var trainerRoot = root.querySelector("[data-quiz-trainer]");
-    var resultBox = root.querySelector("[data-quiz-result]");
+    /* Раньше панель искали внутри [data-quiz], а в разметке она стояла
+       сестринской веткой — resultBox был null, onDone падал на
+       classList.add, и итог не показывался никогда. Ищем по документу
+       и страхуемся от null. */
+    var resultBox = root.querySelector("[data-quiz-result]") || document.querySelector("[data-quiz-result]");
+    var resultTitle = resultBox ? resultBox.querySelector("[data-qr-title]") : null;
+    var resultScore = resultBox ? resultBox.querySelector("[data-qr-score]") : null;
+    var againBtn = resultBox ? resultBox.querySelector(".btn") : null;
+
+    if (againBtn) {
+      /* Обработчик вешается один раз: раньше addEventListener вызывался
+         на каждом круге и кнопка накапливала дубли. */
+      againBtn.addEventListener("click", function () {
+        if (resultBox) resultBox.classList.remove("show");
+        start();
+      });
+    }
 
     function toQuestions(g) {
       var arr = [];
@@ -60,13 +76,24 @@
       if (meta) meta.textContent = "Выбрано " + picked.length + " вопросов из " + rules.length + " правил";
       Trainer.mount(trainerRoot, picked, {
         onDone: function (score, total) {
+          if (!total) return;
           var pct = Math.round((score / total) * 100);
-          resultBox.classList.add("show");
-          resultBox.querySelector("[data-qr-title]").textContent =
-            pct === 100 ? "Отлично, всё верно!" : pct >= 66 ? "Молодец!" : pct >= 33 ? "Неплохо — давай ещё раз!" : "Не сдавайся!";
-          resultBox.querySelector("[data-qr-score]").textContent = score + " из " + total;
-          var btn = resultBox.querySelector(".btn");
-          btn.addEventListener("click", function () { resultBox.classList.remove("show"); start(); });
+          if (resultBox) {
+            if (resultTitle) {
+              resultTitle.textContent =
+                pct === 100 ? "Отлично, всё верно!" : pct >= 66 ? "Молодец!" : pct >= 33 ? "Неплохо — давай ещё раз!" : "Не сдавайся!";
+            }
+            if (resultScore) resultScore.textContent = score + " из " + total;
+            resultBox.classList.add("show");
+
+            /* Итог должен быть и видимым, и озвученным: aria-live уже в
+               разметке, фокус переводим только если не просили меньше движения. */
+            var calm = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+            try {
+              if (!calm) resultBox.scrollIntoView({ behavior: "smooth", block: "nearest" });
+              resultBox.focus({ preventScroll: true });
+            } catch (e) {}
+          }
         }
       });
     }

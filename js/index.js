@@ -5,22 +5,23 @@
     var rules = window.RULES || [];
 
     var totalEl = document.querySelector("[data-total]");
-    if (totalEl) totalEl.textContent = rules.length;
+    if (totalEl) DrevoHelpers.countTo(totalEl, rules.length, 900);
 
     var growsEl = document.querySelector(".tree-stats-num");
     var learned = Progress.learnedCount();
 
     if (growsEl) {
-      growsEl.textContent = learned;
       var txt = document.querySelector("[data-total-text]");
       if (txt) txt.textContent = "из " + rules.length;
+      /* Счётчик растёт от 0 до числа выученных, а не появляется готовым. */
+      DrevoHelpers.countTo(growsEl, learned);
     }
 
     var treeRoot = document.querySelector("[data-tree]");
     if (treeRoot) {
       var tree = Progress.tree(treeRoot);
       var leaves = tree.refresh();
-      if (growsEl && leaves) growsEl.textContent = leaves;
+      if (growsEl && leaves) DrevoHelpers.countTo(growsEl, leaves);
     }
 
     /* Кнопка выбора класса при первом заходе */
@@ -41,7 +42,13 @@
       });
     }
     if (gradePad && !Progress.grade()) {
-      gradePad.scrollIntoView({ behavior: "smooth", block: "center" });
+      /* Раньше здесь был scrollIntoView — страница открывалась прокрученной
+         вниз, а заголовок hero обрезался шапкой. Теперь мягко подсвечиваем
+         сам блок выбора класса и никуда не уезжаем. */
+      gradePad.classList.add("is-hint");
+      gradePad.addEventListener("click", function () {
+        gradePad.classList.remove("is-hint");
+      }, { once: true });
     }
 
     /* Ветки-классы */
@@ -85,6 +92,11 @@
     if (bar) {
       var pct = rules.length ? Math.round((learned / rules.length) * 100) : 0;
       bar.style.width = pct + "%";
+      if (pct > 0) bar.classList.add("ready");
     }
+
+    /* Карточки веток и достижения созданы уже после initReveal —
+       просим движок подхватить их, иначе они остаются прозрачными. */
+    DrevoHelpers.reveal(document);
   });
 })();

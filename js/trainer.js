@@ -97,12 +97,27 @@ var Trainer = (function () {
         var stepIdx = 0;
         var strip = el("div", "tr-strip");
         var prompt = el("p", "tr-prom", "Шаг 1: " + q.steps[0].mark);
+        prompt.setAttribute("aria-live", "polite");
         root.appendChild(prompt);
         q.tokens.forEach(function (tok, i) {
           var s = el("span", "tr-tok", tok);
           if (tok === ",") s.setAttribute("data-punc", "1");
+          /* Слова были обычными span: мышью работало, с клавиатуры — нет.
+             Делаем их кнопками для скринридера и добавляем Enter/Space. */
+          s.setAttribute("role", "button");
+          s.setAttribute("tabindex", "0");
+          s.addEventListener("keydown", function (e) {
+            if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") {
+              e.preventDefault();
+              s.click();
+            }
+          });
           s.addEventListener("click", function () {
             if (root.querySelector(".tr-done")) return;
+            /* Быстрый двойной клик или программный клик по всем словам сразу
+               уводил stepIdx за границу массива: падало на steps[stepIdx].i.
+               Шаг уже пройден — просто игнорируем лишний клик. */
+            if (!q.steps[stepIdx]) return;
             if (i === q.steps[stepIdx].i) {
               s.classList.add("ok");
               var why = el("div", "tr-reveal tr-inline");
